@@ -1,0 +1,24 @@
+# Build output
+release/
+debug/
+*.exe
+*.o
+*.a
+
+# Qt generated
+Makefile
+Makefile.Release
+Makefile.Debug
+ui_*.h
+moc_*.cpp
+object_script.*.Release
+object_script.*.Debug
+.qmake.stash
+
+# Qt Creator
+*.pro.user
+*.pro.user.*
+
+# Windows
+Thumbs.db
+desktop.ini
