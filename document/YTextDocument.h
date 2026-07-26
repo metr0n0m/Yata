@@ -48,6 +48,7 @@ public:
 
     void startSelect(const QPoint & point);
     void moveSelect(const QPoint & point);
+    void selectWordAt(const QPoint & point);
     void copySelected();
 
     QTextBlock begin() const { return m_document->begin(); }

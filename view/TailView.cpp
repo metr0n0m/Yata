@@ -352,9 +352,14 @@ void TailView::mouseMoveEvent(QMouseEvent * event)
     }
 }
 
-void TailView::mouseDoubleClickEvent(QMouseEvent * /*event*/)
+void TailView::mouseDoubleClickEvent(QMouseEvent * event)
 {
-    // TODO: implement double click selection
+    if(event->button() == Qt::LeftButton) {
+        QPoint docPos(docGraphicalPosition(event->pos()));
+        m_document->selectWordAt(docPos);
+        onCopy(true);
+        viewport()->update();
+    }
 }
 
 void TailView::paintEvent(QPaintEvent * event)

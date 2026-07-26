@@ -1,5 +1,8 @@
 # Yata — Release Notes
 
+## 0.2.2 (2026-07-26)
+- Double-click on a word now selects it and copies to X11 selection buffer (was a TODO since 0.2.0)
+
 ## 0.2.1 (2026-07-26)
 - Updated copyright to 2010-2026 James Smith & metr0n0m in all source files and About dialog
 - Updated project URL to https://github.com/metr0n0m/Yata

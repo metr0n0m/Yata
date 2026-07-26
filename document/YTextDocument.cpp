@@ -220,6 +220,16 @@ void YTextDocument::moveSelect(const QPoint & point)
     m_needs_layout = true;
 }
 
+void YTextDocument::selectWordAt(const QPoint & point)
+{
+    int docPos = qdocPosition(point);
+    QTextCursor cursor(m_document.data());
+    cursor.setPosition(docPos);
+    cursor.select(QTextCursor::WordUnderCursor);
+    select(yFileCursor(cursor));
+    m_needs_layout = true;
+}
+
 const QFont & YTextDocument::font() const
 {
     return Preferences::instance()->font();
