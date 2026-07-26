@@ -1,27 +1,26 @@
 # Yata — Release Notes
 
 ## 0.2.3 (2026-07-26)
-- Session now fully restores scroll position and follow-tail mode on restart
-- File integrity validation before restoring position: FNV-32 hash of first 256 bytes + size check
-- Any anomaly (file replaced, truncated, rotated, log rotation) — opens as new, no confusion
-- Fixed MainWindow::fileSessions() not saving address and followTail fields (incomplete since 0.2.0)
+- При повторном открытии файла программа теперь восстанавливает позицию прокрутки
+  и состояние режима слежения за хвостом (follow-tail)
+- Если файл был изменён, перезаписан, усечён или заменён — позиция не восстанавливается,
+  файл открывается как новый (поведение предсказуемо при любом сценарии)
 
 ## 0.2.2 (2026-07-26)
-- Double-click on a word now selects it and copies to X11 selection buffer (was a TODO since 0.2.0)
+- Двойной клик на слове теперь выделяет его целиком
 
 ## 0.2.1 (2026-07-26)
-- Updated copyright to 2010-2026 James Smith & metr0n0m in all source files and About dialog
-- Updated project URL to https://github.com/metr0n0m/Yata
-- Initialized git repository with full project history baseline
+- Обновлён copyright: 2010-2026 James Smith & metr0n0m
+- Обновлена ссылка на проект: https://github.com/metr0n0m/Yata
 
 ---
 
 ## 0.2.0 (2012-02-24) — James Smith
-- Add gui and storage for customization of text colors
-- Rudimentary text selection and text copying
-- Bugfix with laying out non-default fonts
-- Search bugfix: allow user to change case of words already in search history
-- Various text display/layout bugfixes
+- Настройка цветов текста через интерфейс
+- Выделение и копирование текста (базовая реализация)
+- Исправлен расчёт раскладки для нестандартных шрифтов
+- Исправлен поиск: теперь можно менять регистр слов из истории
+- Различные исправления отображения текста
 
 ## 0.1.0 (original) — James Smith
-- Initial release version
+- Первый релиз
