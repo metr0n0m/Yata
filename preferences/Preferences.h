@@ -52,7 +52,8 @@ private:
     QScopedPointer<QFont> m_font;
     QScopedPointer<TextColor> m_normalTextColor;
     QScopedPointer<TextColor> m_selectedTextColor;
-    QScopedPointer<bool> m_debugMenu;
+    bool m_debugMenu;
+    bool m_debugMenuSet;
     QScopedPointer<ParsingError> m_parsingError;
 
     static Preferences * m_instance;

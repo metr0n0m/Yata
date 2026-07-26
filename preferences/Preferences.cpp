@@ -53,8 +53,8 @@ void Preferences::write()
     emitter << YAML::Key << SELECTED_KEY << YAML::Value << *m_selectedTextColor;
     emitter << YAML::EndMap;
 
-    if(m_debugMenu.data()) {
-        emitter << YAML::Key << DEBUG_MENU_KEY << YAML::Value << *m_debugMenu;
+    if(m_debugMenuSet) {
+        emitter << YAML::Key << DEBUG_MENU_KEY << YAML::Value << m_debugMenu;
     }
 
     emitter << YAML::EndMap;
@@ -93,9 +93,8 @@ ParsingStatus::Enum Preferences::read()
                 readColor(m_selectedTextColor.data(), *text, SELECTED_KEY);
             }
             if (const YAML::Node * debugMenuNode = document.FindValue(DEBUG_MENU_KEY)) {
-                bool debugMenu;
-                *debugMenuNode >> debugMenu;
-                m_debugMenu.reset(new bool(debugMenu));
+                *debugMenuNode >> m_debugMenu;
+                m_debugMenuSet = true;
             }
         }
     } catch(YAML::Exception & ex) {
@@ -148,13 +147,15 @@ void Preferences::setSelectedTextColor(const TextColor & color)
 
 bool Preferences::debugMenu() const
 {
-    return m_debugMenu.data() ? *m_debugMenu : false;
+    return m_debugMenuSet ? m_debugMenu : false;
 }
 
 Preferences::Preferences():
     m_font(new QFont()),
     m_normalTextColor(new TextColor(QPalette::Text, QPalette::Base)),
-    m_selectedTextColor(new TextColor(QPalette::HighlightedText, QPalette::Highlight))
+    m_selectedTextColor(new TextColor(QPalette::HighlightedText, QPalette::Highlight)),
+    m_debugMenu(false),
+    m_debugMenuSet(false)
 {
 }
 

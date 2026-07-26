@@ -48,8 +48,13 @@ BufferedFile::Status BufferedFile::getChar(qint64 pos, char * ch)
         QFile file(m_filename);
         if(file.open(QIODevice::ReadOnly)) {
             uchar * buffer = file.map(m_buffer_pos, size);
-            m_buffer.assign(buffer, buffer + size);
-            m_errorString = QString();
+            if(buffer) {
+                m_buffer.assign(buffer, buffer + size);
+                m_errorString = QString();
+            } else {
+                m_buffer.clear();
+                m_errorString = file.errorString();
+            }
         } else {
             m_buffer.clear();
             m_errorString = file.errorString();

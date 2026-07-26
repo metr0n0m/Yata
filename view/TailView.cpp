@@ -342,7 +342,6 @@ void TailView::mouseReleaseEvent(QMouseEvent * event)
     }
 }
 
-#include <QtDebug>
 void TailView::mouseMoveEvent(QMouseEvent * event)
 {
     if(m_leftMouseIsDown) {

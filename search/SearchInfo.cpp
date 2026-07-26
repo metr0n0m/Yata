@@ -51,7 +51,8 @@ void SearchInfo::acceptNewSearch(const SearchCriteria & s)
 
 const SearchCriteria & SearchInfo::search() const
 {
-    return *begin();
+    static const SearchCriteria empty;
+    return m_searches.empty() ? empty : *begin();
 }
 
 SearchInfo::const_iterator SearchInfo::begin() const

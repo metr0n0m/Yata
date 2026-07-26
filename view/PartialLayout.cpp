@@ -31,10 +31,9 @@ bool PartialLayout::onFileChanged(QString * error)
     updateBottomDocument();
     bool success = false;
     if(view()->followTail()) {
+        success = updateView(bottomScreenPosition());
         QScrollBar * vScrollBar = view()->verticalScrollBar();
         vScrollBar->setSliderPosition(vScrollBar->maximum());
-        // TODO: scrollbar didn't move, but updateView() assumes it did with default arguments.
-        success = updateView();
     } else {
         success = updateView(topOfScreen());
     }
