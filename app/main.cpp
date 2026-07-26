@@ -15,6 +15,7 @@
 #include "app/YApplication.h"
 #include "preferences/Preferences.h"
 #include "session/SessionCommon.h"
+#include "highlight/HighlightRules.h"
 
 int main(int argc, char **argv)
 {
@@ -23,6 +24,7 @@ int main(int argc, char **argv)
 
     Preferences * prefs = Preferences::instance();
     ParsingStatus::Enum prefStatus = prefs->read();
+    HighlightRules::instance().read();
     QScopedPointer<MainWindow> win(new MainWindow);
 
     if(prefStatus == ParsingStatus::Error) {

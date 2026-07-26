@@ -16,13 +16,18 @@ build_pass:CONFIG(release, debug|release) {
     TARGET = yatad
 }
 
-DEPENDPATH += . app document fileio gui resource search session view watcher
+DEPENDPATH += . app document fileio gui highlight resource search session view watcher
 
 INCLUDEPATH += . gui
 
 # Input
 HEADERS += \
     app/YApplication.h \
+    document/LogHighlighter.h \
+    highlight/HighlightRule.h \
+    highlight/HighlightRules.h \
+    gui/HighlightRuleDialog.h \
+    gui/HighlightingDialog.h \
     app/YObjectPointer.h \
     dbg/DebugWindow.h \
     document/BlockDataVector.h \
@@ -60,6 +65,8 @@ HEADERS += \
 
 FORMS += \
     dbg/DebugWindow.ui \
+    gui/HighlightRuleDialog.ui \
+    gui/HighlightingDialog.ui \
     gui/MainWindow.ui \
     gui/PreferencesDialog.ui \
     gui/SearchWidget.ui \
@@ -67,6 +74,11 @@ FORMS += \
 
 SOURCES += \
     app/YApplication.cpp \
+    document/LogHighlighter.cpp \
+    highlight/HighlightRule.cpp \
+    highlight/HighlightRules.cpp \
+    gui/HighlightRuleDialog.cpp \
+    gui/HighlightingDialog.cpp \
     app/main.cpp \
     dbg/DebugWindow.cpp \
     document/YFileCursor.cpp \

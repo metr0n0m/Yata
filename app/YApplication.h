@@ -16,6 +16,7 @@ public:
     static QString settingsPath();
     static QString sessionFilePath();
     static QString preferencesFilePath();
+    static QString highlightsFilePath();
 private:
     YApplication();
 };

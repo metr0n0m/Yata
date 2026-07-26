@@ -141,6 +141,11 @@
     <string>&amp;Preferences</string>
    </property>
   </action>
+  <action name="actionHighlighting">
+   <property name="text">
+    <string>&amp;Highlighting...</string>
+   </property>
+  </action>
   <action name="actionFullLayout">
    <property name="checkable">
     <bool>true</bool>

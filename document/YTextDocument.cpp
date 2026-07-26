@@ -6,6 +6,7 @@
  */
 #include "YTextDocument.h"
 #include "YFileCursor.h"
+#include "LogHighlighter.h"
 #include "preferences/TextColor.h"
 #include "preferences/Preferences.h"
 
@@ -21,6 +22,7 @@
 
 YTextDocument::YTextDocument():
     m_document(new QTextDocument()),
+    m_highlighter(new LogHighlighter(m_document.data())),
     m_selectedCursor(new YFileCursor),
     m_numLayoutLines(0),
     m_blockLayoutLines(m_document.data()),

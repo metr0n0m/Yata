@@ -8,6 +8,7 @@
 #include "ui_MainWindow.h"
 #include "preferences/Preferences.h"
 #include "gui/PreferencesDialog.h"
+#include "gui/HighlightingDialog.h"
 #include "view/TailView.h"
 #include "gui/SearchWidget.h"
 #include "session/SessionLoader.h"
@@ -318,6 +319,7 @@ void MainWindow::rebuildEditMenu()
     ui->menuEdit->addAction(ui->actionFindNext);
     ui->menuEdit->addAction(ui->actionFindPrevious);
     ui->menuEdit->addSeparator();
+    ui->menuEdit->addAction(ui->actionHighlighting);
     ui->menuEdit->addAction(ui->actionPreferences);
 }
 
@@ -331,6 +333,12 @@ void MainWindow::on_actionFollowTail_triggered(bool checked)
 void MainWindow::on_actionPreferences_triggered()
 {
     PreferencesDialog dialog;
+    dialog.exec();
+}
+
+void MainWindow::on_actionHighlighting_triggered()
+{
+    HighlightingDialog dialog(this);
     dialog.exec();
 }
 

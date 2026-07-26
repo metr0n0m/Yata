@@ -37,3 +37,9 @@ QString YApplication::preferencesFilePath()
     const QString preferencesFileName = "preferences.yaml";
     return settingsPath() + "/" + preferencesFileName;
 }
+
+QString YApplication::highlightsFilePath()
+{
+    const QString highlightsFileName = "highlights.yaml";
+    return settingsPath() + "/" + highlightsFileName;
+}
