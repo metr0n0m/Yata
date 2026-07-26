@@ -1,5 +1,11 @@
 # Yata — Release Notes
 
+## 0.2.3 (2026-07-26)
+- Session now fully restores scroll position and follow-tail mode on restart
+- File integrity validation before restoring position: FNV-32 hash of first 256 bytes + size check
+- Any anomaly (file replaced, truncated, rotated, log rotation) — opens as new, no confusion
+- Fixed MainWindow::fileSessions() not saving address and followTail fields (incomplete since 0.2.0)
+
 ## 0.2.2 (2026-07-26)
 - Double-click on a word now selects it and copies to X11 selection buffer (was a TODO since 0.2.0)
 

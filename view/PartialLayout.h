@@ -25,6 +25,7 @@ public:
     virtual int topScreenLine() const;
     virtual void scrollTo(int newTopLine);
     virtual bool scrollBy(int line_change);
+    void scrollToAddress(qint64 address);
     virtual void updateAfterKeyPress();
     virtual void vScrollBarAction(int action);
 protected:

@@ -63,6 +63,10 @@ public:
 
     const QString & currentFileError() const { return m_currentFileError; }
 
+    // Session support
+    qint64 sessionAddress() const;
+    void scrollToAddress(qint64 address);
+
 signals:
     void fileError(const QString &);
     void fileErrorCleared();

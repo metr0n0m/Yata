@@ -69,13 +69,24 @@ void MainWindow::addFile(const QString & filename)
     m_tabWidget->openTab(tailView, displayFilename, displayBase);
 }
 
+TailView * MainWindow::tailViewAt(int index) const
+{
+    return dynamic_cast<TailView*>(m_tabWidget->widget(index));
+}
+
 void MainWindow::fileSessions(std::vector<FileSession> * sessions) const
 {
     sessions->clear();
     for (int i = 0; i < m_tabWidget->count(); i++) {
         TailView * view = dynamic_cast<TailView*>(m_tabWidget->widget(i));
-        sessions->push_back(FileSession());
-        sessions->back().path = view->filename().toStdString();
+        if(!view) { continue; }
+        FileSession fs;
+        fs.path       = view->filename().toStdString();
+        fs.address    = view->sessionAddress();
+        fs.followTail = view->followTail();
+        QFileInfo info(view->filename());
+        fs.fileSize   = info.size();
+        sessions->push_back(fs);
     }
 }
 

@@ -27,6 +27,7 @@ public:
     ~MainWindow();
 
     void addFile(const QString & filename);
+    TailView * tailViewAt(int index) const;
 
     void fileSessions(std::vector<FileSession> * sessions) const;
     int currentFileIndex() const;

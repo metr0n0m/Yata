@@ -62,6 +62,14 @@ void PartialLayout::scrollTo(int newTopLine)
     scrollBy(lineChange);
 }
 
+void PartialLayout::scrollToAddress(qint64 address)
+{
+    m_topScreenLine = 0;
+    updateDocument(address, 0);
+    updateScrollBars();
+    view()->viewport()->update();
+}
+
 bool PartialLayout::searchFile(bool isForward)
 {
     bool matchFound = false;

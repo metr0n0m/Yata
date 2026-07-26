@@ -474,3 +474,19 @@ int TailView::numLinesOnScreen() const
     int result = windowHeight / lineHeight;
     return result;
 }
+
+qint64 TailView::sessionAddress() const
+{
+    const BlockDataVector<qint64> & addresses = m_document->lineAddresses();
+    if(addresses.empty()) { return 0; }
+    return addresses.at(0);
+}
+
+void TailView::scrollToAddress(qint64 address)
+{
+    // Called after setFile() — file is already loaded. Only meaningful in
+    // partial layout (large files); full layout uses line-based scrollbar.
+    if(m_layoutStrategy == m_partialLayoutStrategy.data()) {
+        m_partialLayoutStrategy->scrollToAddress(address);
+    }
+}
