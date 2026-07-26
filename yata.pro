@@ -18,8 +18,7 @@ build_pass:CONFIG(release, debug|release) {
 
 DEPENDPATH += . app document fileio gui resource search session view watcher
 
-# TODO: make the following line unnecessary.
-INCLUDEPATH += . gui session app document fileio view search watcher
+INCLUDEPATH += . gui
 
 # Input
 HEADERS += \

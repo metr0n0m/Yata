@@ -6,8 +6,8 @@
  */
 
 #include "Preferences.h"
-#include "YApplication.h"
-#include "TextColor.h"
+#include "app/YApplication.h"
+#include "preferences/TextColor.h"
 #include "session/SessionCommon.h"
 #include <QApplication>
 #include <QColor>

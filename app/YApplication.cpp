@@ -8,7 +8,7 @@
 #include <QObject>
 #include <QString>
 #include <QDir>
-#include "YApplication.h"
+#include "app/YApplication.h"
 
 QString YApplication::displayAppName()
 {

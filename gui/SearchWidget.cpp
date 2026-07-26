@@ -7,7 +7,7 @@
 #include "SearchWidget.h"
 #include "ui_SearchWidget.h"
 
-#include "SearchInfo.h"
+#include "search/SearchInfo.h"
 
 #include <QCompleter>
 #include <QLineEdit>
@@ -15,7 +15,7 @@
 #include <QRegExp>
 #include <QTextStream>
 
-#include "YApplication.h"
+#include "app/YApplication.h"
 
 SearchWidget::SearchWidget(QWidget *parent)
     : QDialog(parent)

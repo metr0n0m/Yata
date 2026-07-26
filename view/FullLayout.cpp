@@ -6,9 +6,9 @@
  */
 #include "FullLayout.h"
 
-#include "FileBlockReader.h"
-#include "TailView.h"
-#include "YTextDocument.h"
+#include "fileio/FileBlockReader.h"
+#include "view/TailView.h"
+#include "document/YTextDocument.h"
 
 #include <QScrollBar>
 

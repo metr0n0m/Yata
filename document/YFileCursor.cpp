@@ -6,7 +6,7 @@
  */
 
 #include "YFileCursor.h"
-#include "YTextDocument.h"
+#include "document/YTextDocument.h"
 #include <QTextCursor>
 #include <QTextBlock>
 #include <QTextDocument>

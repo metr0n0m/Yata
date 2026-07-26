@@ -5,7 +5,7 @@
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #include "FileSearch.h"
-#include "FileBlockReader.h"
+#include "fileio/FileBlockReader.h"
 
 #include <QRegExp>
 

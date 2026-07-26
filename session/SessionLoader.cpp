@@ -4,11 +4,11 @@
  *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
-#include "MainWindow.h"
-#include "SearchInfo.h"
+#include "gui/MainWindow.h"
+#include "search/SearchInfo.h"
 #include "SessionLoader.h"
-#include "TailView.h"
-#include "YApplication.h"
+#include "view/TailView.h"
+#include "app/YApplication.h"
 #include "session/AppSession.h"
 #include "session/FileSession.h"
 #include "session/SearchSession.h"

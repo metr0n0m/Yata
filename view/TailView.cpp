@@ -7,17 +7,17 @@
 
 #include "TailView.h"
 
-#include "DocumentSearch.h"
-#include "FileBlockReader.h"
-#include "FileSearch.h"
+#include "search/DocumentSearch.h"
+#include "fileio/FileBlockReader.h"
+#include "search/FileSearch.h"
 #include "FullLayout.h"
 #include "PartialLayout.h"
 #include "preferences/Preferences.h"
 #include "preferences/TextColor.h"
-#include "SearchInfo.h"
-#include "YApplication.h"
-#include "YFileCursor.h"
-#include "YFileSystemWatcherThread.h"
+#include "search/SearchInfo.h"
+#include "app/YApplication.h"
+#include "document/YFileCursor.h"
+#include "watcher/YFileSystemWatcherThread.h"
 #include "document/YTextDocument.h"
 #include "document/BlockDataVector.h"
 
@@ -169,13 +169,8 @@ bool TailView::searchDocument(bool isForward, bool wrapAround)
         m_documentSearch->setCursor(m_document->fileCursor());
     } else {
         const int topLine = m_layoutStrategy->topScreenLine();
-        int layoutLine = 0;
-        QTextBlock block = m_document->blockLayoutLines().findContainingBlock(topLine, &layoutLine);
-        if(block.isValid()) {
-            int blockLine = topLine - layoutLine;
-            QTextCursor cursor(block);
-            cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, blockLine);
-            YFileCursor ycursor = m_document->yFileCursor(cursor);
+        YFileCursor ycursor = m_document->fileCursorForLayoutLine(topLine);
+        if(!ycursor.isNull()) {
             m_documentSearch->setCursor(ycursor);
         } else {
             m_documentSearch->setCursor(YFileCursor());

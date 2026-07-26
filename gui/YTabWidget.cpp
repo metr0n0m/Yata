@@ -6,7 +6,7 @@
  */
 #include "YTabWidget.h"
 #include "YTabMenuButton.h"
-#include "TailView.h"
+#include "view/TailView.h"
 
 #include <QActionGroup>
 #include <QApplication>

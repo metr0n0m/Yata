@@ -7,8 +7,8 @@
 
 #include "LayoutStrategy.h"
 
-#include "TailView.h"
-#include "YTextDocument.h"
+#include "view/TailView.h"
+#include "document/YTextDocument.h"
 
 LayoutStrategy::LayoutStrategy(TailView * tailView)
     : m_view(tailView)

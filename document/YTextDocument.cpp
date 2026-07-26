@@ -202,6 +202,17 @@ YFileCursor YTextDocument::yFileCursor(int docPos) const
     return YFileCursor(linePos, cursor.positionInBlock());
 }
 
+YFileCursor YTextDocument::fileCursorForLayoutLine(int layoutLine) const
+{
+    int blockLayoutLine = 0;
+    QTextBlock block = m_blockLayoutLines.findContainingBlock(layoutLine, &blockLayoutLine);
+    if(!block.isValid()) { return YFileCursor(); }
+    int blockLine = layoutLine - blockLayoutLine;
+    QTextCursor cursor(block);
+    cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, blockLine);
+    return yFileCursor(cursor);
+}
+
 void YTextDocument::startSelect(const QPoint & point)
 {
     int docPos = qdocPosition(point);

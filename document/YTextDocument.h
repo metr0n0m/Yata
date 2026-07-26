@@ -51,6 +51,8 @@ public:
     void selectWordAt(const QPoint & point);
     void copySelected();
 
+    YFileCursor fileCursorForLayoutLine(int layoutLine) const;
+
     QTextBlock begin() const { return m_document->begin(); }
     QTextBlock end() const { return m_document->end(); }
     QTextBlock lastBlock() const { return m_document->lastBlock(); }
@@ -68,8 +70,6 @@ private:
     void setColors(QTextCursor *cursor, const TextColor & textColor);
     int qdocPosition(const QPoint point) const;
     YFileCursor yFileCursor(int docPos) const;
-public:
-    // TODO: make yFileCursor() private
     YFileCursor yFileCursor(const QTextCursor & qcursor) const;
 
 private:
