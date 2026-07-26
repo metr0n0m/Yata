@@ -30,6 +30,9 @@ public:
     const TextColor & textColor() const;
     void setTextColor(const TextColor & tc);
 
+signals:
+    void textColorChanged();
+
 private slots:
     void on_defaultCheckBox_clicked(bool checked);
     void currentColorChanged(const QColor & color);

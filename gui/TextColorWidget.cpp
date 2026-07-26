@@ -60,6 +60,7 @@ void TextColorWidget::currentColorChanged(const QColor & color)
     }
 
     ui->defaultCheckBox->setChecked(false);
+    emit textColorChanged();
 }
 
 void TextColorWidget::updateColorButtons()

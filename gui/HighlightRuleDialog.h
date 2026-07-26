@@ -26,6 +26,7 @@ public:
 
 private slots:
     void on_buttonBox_accepted();
+    void updatePreview();
 
 private:
     QScopedPointer<Ui::HighlightRuleDialog> ui;

@@ -29,7 +29,7 @@ void LogHighlighter::highlightBlock(const QString & text)
         fmt.setBackground(rule.color.background());
 
         QRegExp regex(rule.pattern,
-            Qt::CaseSensitive,
+            rule.caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive,
             rule.isRegex ? QRegExp::RegExp2 : QRegExp::FixedString);
 
         int pos = 0;

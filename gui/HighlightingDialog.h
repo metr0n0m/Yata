@@ -12,6 +12,8 @@
 #include <QList>
 #include <QScopedPointer>
 
+class QTableWidgetItem;
+
 namespace Ui {
     class HighlightingDialog;
 }
@@ -26,7 +28,8 @@ private slots:
     void on_addButton_clicked();
     void on_editButton_clicked();
     void on_deleteButton_clicked();
-    void on_rulesTable_cellChanged(int row, int column);
+    void on_rulesTable_itemChanged(QTableWidgetItem * item);
+    void on_rulesTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
     void on_buttonBox_accepted();
 
 private:

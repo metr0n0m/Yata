@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>380</width>
-    <height>130</height>
+    <width>400</width>
+    <height>180</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,28 +15,73 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="patternLayout">
-     <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
       <widget class="QLabel" name="patternLabel">
        <property name="text">
         <string>Pattern:</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="1">
       <widget class="QLineEdit" name="patternEdit"/>
      </item>
-     <item>
-      <widget class="QCheckBox" name="regexCheckBox">
+     <item row="1" column="0">
+      <spacer>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </spacer>
+     </item>
+     <item row="1" column="1">
+      <layout class="QHBoxLayout">
+       <item>
+        <widget class="QCheckBox" name="caseSensitiveCheckBox">
+         <property name="text">
+          <string>Case sensitive</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="regexCheckBox">
+         <property name="text">
+          <string>Regular expression</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="colorLabel">
        <property name="text">
-        <string>Regex</string>
+        <string>Colors:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="TextColorWidget" name="colorWidget" native="true"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="previewLabel">
+       <property name="text">
+        <string>Preview:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLabel" name="previewText">
+       <property name="text">
+        <string>Sample log text with the pattern highlighted here</string>
+       </property>
+       <property name="autoFillBackground">
+        <bool>true</bool>
+       </property>
+       <property name="margin">
+        <number>4</number>
        </property>
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="TextColorWidget" name="colorWidget" native="true"/>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -60,12 +105,6 @@
  </customwidgets>
  <resources/>
  <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>HighlightRuleDialog</receiver>
-   <slot>accept()</slot>
-  </connection>
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>

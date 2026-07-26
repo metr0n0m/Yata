@@ -18,16 +18,19 @@ namespace YAML {
 struct HighlightRule {
     QString pattern;
     bool isRegex;
+    bool caseSensitive;
     bool enabled;
     TextColor color;
 
     static const std::string PATTERN_KEY;
     static const std::string IS_REGEX_KEY;
+    static const std::string CASE_SENSITIVE_KEY;
     static const std::string ENABLED_KEY;
     static const std::string COLOR_KEY;
 
     HighlightRule()
         : isRegex(false)
+        , caseSensitive(false)
         , enabled(true)
         , color(QPalette::Text, QPalette::Base)
     {
