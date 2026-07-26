@@ -1,6 +1,6 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
- * Copyright 2010-2012 James Smith
+ * Copyright 2010-2026 James Smith & metr0n0m
  *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
@@ -207,8 +207,8 @@ void MainWindow::on_actionAboutYata_triggered()
         tr("(Yet Another Tail Application)<br>") <<
         tr("A universal log viewer<br>") <<
         tr("Version ") << YApplication::appVersion() <<
-        tr("<br><br>Copyright (c) 2010-2012 James Smith<br><br>"
-           "http://code.google.com/p/yata");
+        tr("<br><br>Copyright &copy; 2010-2026 James Smith &amp; metr0n0m<br><br>"
+           "<a href=\"https://github.com/metr0n0m/Yata\">https://github.com/metr0n0m/Yata</a>");
     QMessageBox::about(this, title, message);
 }
 
