@@ -17,7 +17,6 @@
 #include <yaml-cpp/yaml.h>
 #include <fstream>
 
-// TODO: implement versioning for preference files
 
 Preferences * Preferences::m_instance;
 
@@ -58,10 +57,16 @@ void Preferences::write()
     out << emitter.c_str();
 }
 
-void Preferences::read()
+ParsingStatus::Enum Preferences::read()
 {
+    m_parsingError.reset();
+
+    std::ifstream in(YApplication::preferencesFilePath().toStdString().c_str());
+    if(!in) {
+        return ParsingStatus::FileNotFound;
+    }
+
     try {
-        std::ifstream in(YApplication::preferencesFilePath().toStdString().c_str());
         YAML::Parser parser(in);
         YAML::Node document;
         if (parser.GetNextDocument(document)) {
@@ -79,8 +84,16 @@ void Preferences::read()
             }
         }
     } catch(YAML::Exception & ex) {
-        // TODO: handle parsing errors
+        m_parsingError.reset(new ParsingError(ex.mark.line, ex.mark.column, ex.msg));
+        return ParsingStatus::Error;
     }
+
+    return ParsingStatus::OK;
+}
+
+const ParsingError * Preferences::parsingError() const
+{
+    return m_parsingError.data();
 }
 
 const QFont & Preferences::font() const

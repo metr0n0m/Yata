@@ -10,6 +10,7 @@
 
 #include <QObject>
 #include <QScopedPointer>
+#include "session/SessionCommon.h"
 
 class QFont;
 class TextColor;
@@ -21,7 +22,8 @@ public:
     static Preferences * instance();
 
     void write();
-    void read();
+    ParsingStatus::Enum read();
+    const ParsingError * parsingError() const;
 
     const QFont & font() const;
     void setFont(const QFont & font);
@@ -48,6 +50,7 @@ private:
     QScopedPointer<TextColor> m_normalTextColor;
     QScopedPointer<TextColor> m_selectedTextColor;
     QScopedPointer<bool> m_debugMenu;
+    QScopedPointer<ParsingError> m_parsingError;
 
     static Preferences * m_instance;
 };
