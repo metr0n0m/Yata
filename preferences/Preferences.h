@@ -21,6 +21,9 @@ class Preferences: public QObject {
 public:
     static Preferences * instance();
 
+    static const int VERSION_MAJOR = 1;
+    static const int VERSION_MINOR = 0;
+
     void write();
     ParsingStatus::Enum read();
     const ParsingError * parsingError() const;

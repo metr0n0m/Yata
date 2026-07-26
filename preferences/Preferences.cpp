@@ -20,11 +20,12 @@
 
 Preferences * Preferences::m_instance;
 
-const std::string TEXT_KEY = "text";
-const std::string FONT_KEY = "font";
-const std::string NORMAL_KEY = "normal";
-const std::string SELECTED_KEY = "selected";
-const std::string DEBUG_MENU_KEY = "debug-menu";
+const std::string VERSION_KEY     = "version";
+const std::string TEXT_KEY        = "text";
+const std::string FONT_KEY        = "font";
+const std::string NORMAL_KEY      = "normal";
+const std::string SELECTED_KEY    = "selected";
+const std::string DEBUG_MENU_KEY  = "debug-menu";
 
 Preferences * Preferences::instance()
 {
@@ -39,6 +40,11 @@ void Preferences::write()
     YAML::Emitter emitter;
 
     emitter << YAML::BeginMap;
+    emitter << YAML::Key << VERSION_KEY << YAML::Value;
+    emitter << YAML::Flow << YAML::BeginSeq
+            << Preferences::VERSION_MAJOR << Preferences::VERSION_MINOR
+            << YAML::EndSeq;
+
     emitter << YAML::Key << TEXT_KEY << YAML::Value;
 
     emitter << YAML::BeginMap;
@@ -70,6 +76,15 @@ ParsingStatus::Enum Preferences::read()
         YAML::Parser parser(in);
         YAML::Node document;
         if (parser.GetNextDocument(document)) {
+            if (const YAML::Node * version = document.FindValue(VERSION_KEY)) {
+                std::vector<int> versionVec;
+                *version >> versionVec;
+                if(versionVec.size() == 2) {
+                    if(versionVec[0] > Preferences::VERSION_MAJOR) {
+                        return ParsingStatus::IncompatibleVersion;
+                    }
+                }
+            }
             if (const YAML::Node * text = document.FindValue(TEXT_KEY)) {
                 std::string fontStr = getValue<std::string>(*text, FONT_KEY);
                 m_font->fromString(fontStr.c_str());

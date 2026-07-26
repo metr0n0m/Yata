@@ -33,6 +33,13 @@ int main(int argc, char **argv)
             << QString::fromStdString(err ? err->message : "unknown error")
             << QObject::tr("\n\nDefault preferences will be used.");
         QMessageBox::warning(win.data(), YApplication::displayAppName(), msg);
+    } else if(prefStatus == ParsingStatus::IncompatibleVersion) {
+        QString msg;
+        QTextStream(&msg)
+            << QObject::tr("The preferences file was saved by a newer version of ")
+            << YApplication::displayAppName()
+            << QObject::tr(" and cannot be read.\n\nDefault preferences will be used.");
+        QMessageBox::warning(win.data(), YApplication::displayAppName(), msg);
     }
 
     QDir dir;
