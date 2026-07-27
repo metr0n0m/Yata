@@ -524,14 +524,12 @@ void TailView::paintLineNumbers(QPainter * painter, const QRect & rect)
     QFontMetrics fontMetrics(font);
     int lineSpacing = fontMetrics.lineSpacing();
 
-    // Background of line number area
-    QColor bgColor = Preferences::instance()->normalTextColor().background().darker(110);
-    QColor fgColor = Preferences::instance()->normalTextColor().foreground();
-    fgColor.setAlpha(160);
-    painter->fillRect(rect, bgColor);
+    static const QColor bgColor(235, 235, 235);   // light gray
+    static const QColor fgColor(50,  50,  50);    // dark gray, almost black
+    static const QColor sepColor(180, 180, 180);  // separator
 
-    // Separator line on right edge
-    painter->setPen(QPen(fgColor, 1));
+    painter->fillRect(rect, bgColor);
+    painter->setPen(QPen(sepColor, 1));
     painter->drawLine(rect.right(), rect.top(), rect.right(), rect.bottom());
 
     int firstLine = m_layoutStrategy->firstVisibleLineNumber();
