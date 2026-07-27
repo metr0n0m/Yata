@@ -91,6 +91,7 @@ void TailView::setFile(const QString & filename)
     horizontalScrollBar()->setSliderPosition(0);
 
     onFileChanged();
+    setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
 }
 
 void TailView::setLayoutType(LayoutType layoutType)
@@ -384,7 +385,6 @@ void TailView::paintEvent(QPaintEvent * event)
     m_layoutStrategy->performLayout();
 
     const int lnWidth = lineNumberAreaWidth();
-    setViewportMargins(lnWidth, 0, 0, 0);
 
     QPainter painter(viewport());
     QRectF viewrect(event->rect());
@@ -491,6 +491,7 @@ void TailView::vScrollBarAction(int action)
 
 void TailView::onPreferencesChanged()
 {
+    setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
     m_document->markDirty();
 }
 

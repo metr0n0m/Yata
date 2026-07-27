@@ -81,6 +81,12 @@ bool PartialLayout::onFileChanged(QString * error)
 
 void PartialLayout::resizeEvent()
 {
+    if(view()->filterState().isActive()) {
+        // Filter mode: scrollbars need update but document content is already correct
+        updateScrollBars();
+        view()->viewport()->update();
+        return;
+    }
     updateBottomDocument();
     updateView(topOfScreen());
 }
