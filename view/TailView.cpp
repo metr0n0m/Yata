@@ -301,6 +301,9 @@ void TailView::onFileChanged()
         break;
     }
 
+    // Filter requires PartialLayout — it builds a virtual document from match list
+    if(m_filterState.isActive()) { fullLayout = false; }
+
     if(fullLayout) {
         m_layoutStrategy = m_fullLayoutStrategy.data();
     } else {
