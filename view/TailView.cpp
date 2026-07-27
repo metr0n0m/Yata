@@ -16,7 +16,7 @@
 #include "preferences/TextColor.h"
 #include "search/SearchInfo.h"
 #include "highlight/HighlightRules.h"
-#include "filter/FileFilter.h"
+#include "filter/FilterScanThread.h"
 #include "app/YApplication.h"
 #include "document/YFileCursor.h"
 #include "watcher/YFileSystemWatcherThread.h"
@@ -271,19 +271,28 @@ void TailView::setActive(bool active)
 
 void TailView::onFileChanged()
 {
-    // If filter is active, scan newly added content (tail support)
-    if(m_filterState.isActive() && !m_filename.isEmpty()) {
+    // If filter is active and a scan is NOT already running, check for new content
+    if(m_filterState.isActive() && !m_filename.isEmpty() && !m_scanThread) {
         QFileInfo info(m_filename);
         qint64 currentSize = info.size();
         if(currentSize < m_lastScannedSize) {
-            // File shrank (rotation/truncate) — rescan from scratch
-            m_filterState.setPattern(m_filterState.pattern(),
+            // File shrank — rescan from scratch asynchronously
+            applyFilter(m_filterState.pattern(),
                 m_filterState.isRegex(), m_filterState.caseSensitive());
-            FileFilter::scanAll(m_filename, &m_filterState);
+            return;
         } else if(currentSize > m_lastScannedSize) {
-            FileFilter::scanFrom(m_filename, m_lastScannedSize, &m_filterState);
+            // Scan only new content asynchronously
+            qint64 scanFrom = m_lastScannedSize;
+            m_lastScannedSize = currentSize;
+            FilterScanThread * t = new FilterScanThread(
+                m_filename, m_filterState.pattern(),
+                m_filterState.isRegex(), m_filterState.caseSensitive(),
+                scanFrom, this);
+            connect(t, SIGNAL(scanFinished(QVector<qint64>)),
+                    this, SLOT(onScanFinished(QVector<qint64>)));
+            t->start();
+            return;
         }
-        m_lastScannedSize = currentSize;
     }
 
     bool fullLayout = false;
@@ -506,24 +515,49 @@ void TailView::scrollToAddress(qint64 address)
 
 void TailView::applyFilter(const QString & pattern, bool isRegex, bool caseSensitive)
 {
+    // Stop any running scan
+    if(m_scanThread) {
+        m_scanThread->stop();
+        m_scanThread.reset();
+    }
+
     m_filterState.setPattern(pattern, isRegex, caseSensitive);
     m_lastScannedSize = 0;
 
-    if(!m_filename.isEmpty()) {
-        QFileInfo info(m_filename);
-        m_lastScannedSize = info.size();
-        FileFilter::scanAll(m_filename, &m_filterState);
+    if(m_filename.isEmpty()) {
+        emit filterChanged();
+        return;
     }
 
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+    m_scanThread.reset(new FilterScanThread(
+        m_filename, pattern, isRegex, caseSensitive, 0, this));
+    connect(m_scanThread.data(), SIGNAL(scanFinished(QVector<qint64>)),
+            this, SLOT(onScanFinished(QVector<qint64>)));
+    m_scanThread->start();
+}
+
+void TailView::clearFilter()
+{
+    if(m_scanThread) {
+        m_scanThread->stop();
+        m_scanThread.reset();
+    }
+    QApplication::restoreOverrideCursor();
+    m_filterState.clear();
+    m_lastScannedSize = 0;
     m_document->markDirty();
     onFileChanged();
     emit filterChanged();
 }
 
-void TailView::clearFilter()
+void TailView::onScanFinished(QVector<qint64> matchAddresses)
 {
-    m_filterState.clear();
-    m_lastScannedSize = 0;
+    QApplication::restoreOverrideCursor();
+    m_filterState.setMatchAddresses(matchAddresses);
+    QFileInfo info(m_filename);
+    m_lastScannedSize = info.size();
     m_document->markDirty();
     onFileChanged();
     emit filterChanged();
