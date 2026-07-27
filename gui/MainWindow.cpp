@@ -255,8 +255,9 @@ void MainWindow::onCurrentTabChanged(int oldIndex, int newIndex)
         return;
     }
 
-    QString filename = m_tabWidget->tabText(newIndex);
-    setWindowTitle(filename + " - " + YApplication::displayAppName());
+    // Show full path in title bar — use tooltip which stores the full path
+    QString fullPath = m_tabWidget->tabToolTip(newIndex);
+    setWindowTitle(fullPath.isEmpty() ? YApplication::displayAppName() : fullPath);
     if(TailView * tailView = getCurrentView()) {
         // Set debugging menu
         QAction * toBeChecked = 0;
