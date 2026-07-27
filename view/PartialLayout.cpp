@@ -32,6 +32,7 @@ bool PartialLayout::onFileChanged(QString * error)
 
     const FilterState & fs = view()->filterState();
     if(fs.isActive()) {
+        m_topScreenLine = 0;
         updateScrollBars();
         bool success = false;
         const QVector<qint64> & matches = fs.matchAddresses();
@@ -56,6 +57,7 @@ bool PartialLayout::onFileChanged(QString * error)
             *error = m_blockReader->errorString();
             return false;
         }
+        view()->viewport()->update();
         return true;
     }
 
