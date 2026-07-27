@@ -21,7 +21,8 @@ LayoutStrategy::~LayoutStrategy()
 
 void LayoutStrategy::performLayout()
 {
-    document()->layout(view()->viewport()->width());
+    int textWidth = view()->viewport()->width() - view()->lineNumberAreaWidth();
+    document()->layout(qMax(textWidth, 1));
 }
 
 TailView * LayoutStrategy::view()

@@ -91,7 +91,6 @@ void TailView::setFile(const QString & filename)
     horizontalScrollBar()->setSliderPosition(0);
 
     onFileChanged();
-    setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
 }
 
 void TailView::setLayoutType(LayoutType layoutType)
@@ -165,7 +164,9 @@ QPoint TailView::docGraphicalPosition(const QPoint & viewPoint)
     int lineSpacing = QFontMetrics(m_document->font()).lineSpacing();
     double docTop = m_layoutStrategy->topScreenLine() * lineSpacing;
     double doc_y = viewPoint.y() + docTop;
-    return QPoint(viewPoint.x(), doc_y);
+    // Subtract line number area width so x is relative to text, not viewport
+    int doc_x = viewPoint.x() - lineNumberAreaWidth();
+    return QPoint(qMax(doc_x, 0), doc_y);
 }
 
 bool TailView::searchDocument(bool isForward, bool wrapAround)
@@ -400,7 +401,7 @@ void TailView::paintEvent(QPaintEvent * event)
         qreal dy = m_document->blockGraphicalPositions().at(block.blockNumber());
 
         int scrollValue = m_layoutStrategy->topScreenLine();
-        QPoint start(0, dy - scrollValue * fontMetrics.lineSpacing());
+        QPoint start(lnWidth, dy - scrollValue * fontMetrics.lineSpacing());
         QRectF layoutRect(layout->boundingRect());
         layoutRect.moveTo(start);
         if(viewrect.intersects(layoutRect)) {
@@ -408,10 +409,9 @@ void TailView::paintEvent(QPaintEvent * event)
         }
     }
 
-    // Paint line numbers in the left margin (outside viewport)
-    QPainter lnPainter(this);
-    QRect lnRect(0, viewport()->pos().y(), lnWidth, viewport()->height());
-    paintLineNumbers(&lnPainter, lnRect);
+    // Paint line numbers on the left part of the viewport
+    QRect lnRect(0, 0, lnWidth, viewport()->height());
+    paintLineNumbers(&painter, lnRect);
 
     // Update status bar line info
     int firstLine = m_layoutStrategy->firstVisibleLineNumber();
@@ -494,7 +494,6 @@ void TailView::vScrollBarAction(int action)
 
 void TailView::onPreferencesChanged()
 {
-    setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
     m_document->markDirty();
 }
 
