@@ -16,6 +16,7 @@
 #include "preferences/TextColor.h"
 #include "search/SearchInfo.h"
 #include "highlight/HighlightRules.h"
+#include "filter/FileFilter.h"
 #include "app/YApplication.h"
 #include "document/YFileCursor.h"
 #include "watcher/YFileSystemWatcherThread.h"
@@ -48,6 +49,7 @@ TailView::TailView(QWidget * parent)
     , m_partialLayoutStrategy(new PartialLayout(this))
     , m_layoutStrategy(m_partialLayoutStrategy.data())
     , m_followTail(true)
+    , m_lastScannedSize(0)
     , m_documentSearch(new DocumentSearch(m_document.data()))
 {
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), SLOT(vScrollBarAction(int)));
@@ -269,6 +271,21 @@ void TailView::setActive(bool active)
 
 void TailView::onFileChanged()
 {
+    // If filter is active, scan newly added content (tail support)
+    if(m_filterState.isActive() && !m_filename.isEmpty()) {
+        QFileInfo info(m_filename);
+        qint64 currentSize = info.size();
+        if(currentSize < m_lastScannedSize) {
+            // File shrank (rotation/truncate) — rescan from scratch
+            m_filterState.setPattern(m_filterState.pattern(),
+                m_filterState.isRegex(), m_filterState.caseSensitive());
+            FileFilter::scanAll(m_filename, &m_filterState);
+        } else if(currentSize > m_lastScannedSize) {
+            FileFilter::scanFrom(m_filename, m_lastScannedSize, &m_filterState);
+        }
+        m_lastScannedSize = currentSize;
+    }
+
     bool fullLayout = false;
     QFileInfo info(m_filename);
     switch(m_layoutType) {
@@ -485,4 +502,29 @@ void TailView::scrollToAddress(qint64 address)
     if(m_layoutStrategy == m_partialLayoutStrategy.data()) {
         m_partialLayoutStrategy->scrollToAddress(address);
     }
+}
+
+void TailView::applyFilter(const QString & pattern, bool isRegex, bool caseSensitive)
+{
+    m_filterState.setPattern(pattern, isRegex, caseSensitive);
+    m_lastScannedSize = 0;
+
+    if(!m_filename.isEmpty()) {
+        QFileInfo info(m_filename);
+        m_lastScannedSize = info.size();
+        FileFilter::scanAll(m_filename, &m_filterState);
+    }
+
+    m_document->markDirty();
+    onFileChanged();
+    emit filterChanged();
+}
+
+void TailView::clearFilter()
+{
+    m_filterState.clear();
+    m_lastScannedSize = 0;
+    m_document->markDirty();
+    onFileChanged();
+    emit filterChanged();
 }

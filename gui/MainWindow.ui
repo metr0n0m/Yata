@@ -50,6 +50,15 @@
     <addaction name="actionRefresh"/>
     <addaction name="actionFollowTail"/>
    </widget>
+   <widget class="QMenu" name="menuFilter">
+    <property name="title">
+     <string>F&amp;ilter</string>
+    </property>
+    <addaction name="actionFilterByKeyword"/>
+    <addaction name="actionFilterByPattern"/>
+    <addaction name="separator"/>
+    <addaction name="actionClearFilter"/>
+   </widget>
    <widget class="QMenu" name="menuDebug">
     <property name="title">
      <string>&amp;Debug</string>
@@ -63,6 +72,7 @@
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
+   <addaction name="menuFilter"/>
    <addaction name="menuHelp"/>
    <addaction name="menuDebug"/>
   </widget>
@@ -144,6 +154,21 @@
   <action name="actionHighlighting">
    <property name="text">
     <string>&amp;Highlighting...</string>
+   </property>
+  </action>
+  <action name="actionFilterByKeyword">
+   <property name="text">
+    <string>Filter by &amp;keyword...</string>
+   </property>
+  </action>
+  <action name="actionFilterByPattern">
+   <property name="text">
+    <string>Filter by &amp;pattern...</string>
+   </property>
+  </action>
+  <action name="actionClearFilter">
+   <property name="text">
+    <string>&amp;Clear filter</string>
    </property>
   </action>
   <action name="actionFullLayout">

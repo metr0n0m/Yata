@@ -58,6 +58,10 @@ private slots:
 
     void on_actionPreferences_triggered();
     void on_actionHighlighting_triggered();
+    void on_actionFilterByKeyword_triggered();
+    void on_actionFilterByPattern_triggered();
+    void on_actionClearFilter_triggered();
+    void onFilterChanged();
 
     void on_actionFullLayout_triggered();
     void on_actionPartialLayout_triggered();

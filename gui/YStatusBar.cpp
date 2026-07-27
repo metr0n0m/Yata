@@ -7,16 +7,18 @@
 
 #include "YStatusBar.h"
 #include <QLabel>
-#include <QTextDocument>
 #include <QStringBuilder>
 
 YStatusBar::YStatusBar(QWidget *parent):
     QStatusBar(parent),
-    m_leftLabel(new QLabel(this))
+    m_leftLabel(new QLabel(this)),
+    m_filterLabel(new QLabel(this))
 {
-    // Set a small minimum size so the label won't prevent the window from resizing smaller that its text.
     m_leftLabel->setMinimumSize(QSize(1,1));
     addWidget(m_leftLabel.data());
+
+    m_filterLabel->setMinimumSize(QSize(1,1));
+    addPermanentWidget(m_filterLabel.data());
 }
 
 YStatusBar::~YStatusBar()
@@ -26,11 +28,23 @@ YStatusBar::~YStatusBar()
 void YStatusBar::errorMessage(const QString & msg)
 {
     QString format = QString("<p style=\"background-color:yellow\">") %
-        Qt::escape(msg) % "</p>";
+        msg % "</p>";
     m_leftLabel->setText(format);
 }
 
 void YStatusBar::clearErrorMessage()
 {
     m_leftLabel->clear();
+}
+
+void YStatusBar::filterMessage(const QString & msg)
+{
+    QString format = QString("<p style=\"background-color:#c8e6ff; color:#00008b;\">") %
+        msg % "</p>";
+    m_filterLabel->setText(format);
+}
+
+void YStatusBar::clearFilterMessage()
+{
+    m_filterLabel->clear();
 }

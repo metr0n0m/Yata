@@ -23,9 +23,12 @@ public:
 public slots:
     void errorMessage(const QString & msg);
     void clearErrorMessage();
+    void filterMessage(const QString & msg);
+    void clearFilterMessage();
 
 private:
     YObjectPointer<QLabel> m_leftLabel;
+    YObjectPointer<QLabel> m_filterLabel;
 };
 
 #endif // YSTATUSBAR_H

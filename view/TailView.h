@@ -11,6 +11,7 @@
 #include <QScopedPointer>
 #include <vector>
 #include "app/YObjectPointer.h"
+#include "filter/FilterState.h"
 
 class DocumentSearch;
 class FullLayout;
@@ -67,9 +68,15 @@ public:
     qint64 sessionAddress() const;
     void scrollToAddress(qint64 address);
 
+    // Filter support
+    void applyFilter(const QString & pattern, bool isRegex, bool caseSensitive);
+    void clearFilter();
+    const FilterState & filterState() const { return m_filterState; }
+
 signals:
     void fileError(const QString &);
     void fileErrorCleared();
+    void filterChanged();
 
 public slots:
     void newSearch();
@@ -112,6 +119,8 @@ private:
     LayoutStrategy * m_layoutStrategy;
 
     bool m_followTail;
+    FilterState m_filterState;
+    qint64 m_lastScannedSize;
 
     QScopedPointer<DocumentSearch> m_documentSearch;
 };

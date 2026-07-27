@@ -16,14 +16,18 @@ build_pass:CONFIG(release, debug|release) {
     TARGET = yatad
 }
 
-DEPENDPATH += . app document fileio gui highlight resource search session view watcher
+DEPENDPATH += . app document fileio filter gui highlight resource search session view watcher
 
 INCLUDEPATH += . gui
 
 # Input
 HEADERS += \
     app/YApplication.h \
+    filter/FilterState.h \
+    filter/FileFilter.h \
     highlight/HighlightRule.h \
+    gui/FilterDialog.h \
+    gui/PatternFilterDialog.h \
     highlight/HighlightRules.h \
     gui/HighlightRuleDialog.h \
     gui/HighlightingDialog.h \
@@ -64,8 +68,10 @@ HEADERS += \
 
 FORMS += \
     dbg/DebugWindow.ui \
+    gui/FilterDialog.ui \
     gui/HighlightRuleDialog.ui \
     gui/HighlightingDialog.ui \
+    gui/PatternFilterDialog.ui \
     gui/MainWindow.ui \
     gui/PreferencesDialog.ui \
     gui/SearchWidget.ui \
@@ -73,7 +79,11 @@ FORMS += \
 
 SOURCES += \
     app/YApplication.cpp \
+    filter/FilterState.cpp \
+    filter/FileFilter.cpp \
     highlight/HighlightRule.cpp \
+    gui/FilterDialog.cpp \
+    gui/PatternFilterDialog.cpp \
     highlight/HighlightRules.cpp \
     gui/HighlightRuleDialog.cpp \
     gui/HighlightingDialog.cpp \

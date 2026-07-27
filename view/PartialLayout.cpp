@@ -10,6 +10,7 @@
 #include "search/FileSearch.h"
 #include "fileio/FileBlockReader.h"
 #include "view/TailView.h"
+#include "filter/FilterState.h"
 #include "document/YTextDocument.h"
 
 #include <QScrollBar>
@@ -28,6 +29,36 @@ PartialLayout::PartialLayout(TailView * tailView)
 bool PartialLayout::onFileChanged(QString * error)
 {
     m_blockReader.reset(new FileBlockReader(view()->filename()));
+
+    const FilterState & fs = view()->filterState();
+    if(fs.isActive()) {
+        updateScrollBars();
+        bool success = false;
+        const QVector<qint64> & matches = fs.matchAddresses();
+        if(matches.isEmpty()) {
+            // No matches — show empty document
+            QString empty;
+            std::vector<qint64> emptyAddrs;
+            document()->setText(empty, emptyAddrs);
+            performLayout();
+            success = true;
+        } else if(view()->followTail()) {
+            // Show last N matching lines
+            int n = view()->numLinesOnScreen();
+            int startIdx = qMax(0, matches.size() - n);
+            success = updateDocumentFromFilter(startIdx);
+            QScrollBar * vScrollBar = view()->verticalScrollBar();
+            vScrollBar->setSliderPosition(vScrollBar->maximum());
+        } else {
+            success = updateDocumentFromFilter(0);
+        }
+        if(!success) {
+            *error = m_blockReader->errorString();
+            return false;
+        }
+        return true;
+    }
+
     updateBottomDocument();
     bool success = false;
     if(view()->followTail()) {
@@ -129,6 +160,12 @@ void PartialLayout::vScrollBarAction(int action)
 
     if(line_change) {
         scrollBy(line_change);
+    } else if(view()->filterState().isActive()) {
+        // Scrollbar moved directly — update from filter index
+        int idx = view()->verticalScrollBar()->sliderPosition();
+        const QVector<qint64> & matches = view()->filterState().matchAddresses();
+        idx = qMax(0, qMin(idx, matches.size() - 1));
+        updateDocumentFromFilter(idx);
     } else {
         updateView();
     }
@@ -136,9 +173,19 @@ void PartialLayout::vScrollBarAction(int action)
 
 void PartialLayout::updateScrollBars()
 {
-    const qint64 bottom_screen_pos = bottomScreenPosition();
-    const int approx_lines = static_cast<int>(bottom_screen_pos / APPROXIMATE_CHARS_PER_LINE);
-    view()->updateScrollBars(approx_lines);
+    int maxLines;
+    if(view()->filterState().isActive()) {
+        maxLines = qMax(0, view()->filterState().matchAddresses().size() - view()->numLinesOnScreen());
+    } else {
+        const qint64 bottom_screen_pos = bottomScreenPosition();
+        maxLines = static_cast<int>(bottom_screen_pos / APPROXIMATE_CHARS_PER_LINE);
+    }
+    view()->updateScrollBars(maxLines);
+}
+
+int PartialLayout::filterMatchCount() const
+{
+    return view()->filterState().matchAddresses().size();
 }
 
 bool PartialLayout::updateView(qint64 new_line_address /*=-1*/, bool * at_bottom /*=0*/)
@@ -182,6 +229,19 @@ bool PartialLayout::updateView(qint64 new_line_address /*=-1*/, bool * at_bottom
 bool PartialLayout::scrollBy(int line_change)
 {
     QScrollBar * verticalScrollBar = view()->verticalScrollBar();
+
+    // Filter mode: scroll by match index
+    if(view()->filterState().isActive()) {
+        if(line_change != 0) {
+            int idx = verticalScrollBar->sliderPosition() + line_change;
+            const QVector<qint64> & matches = view()->filterState().matchAddresses();
+            idx = qMax(0, qMin(idx, matches.size() - 1));
+            verticalScrollBar->setSliderPosition(idx);
+            updateDocumentFromFilter(idx);
+        }
+        view()->viewport()->update();
+        return true;
+    }
 
     if(line_change != 0) {
         if(line_change < 0) {
@@ -252,6 +312,30 @@ qint64 PartialLayout::keepToLowerBound(const QTextBlock & block, int * blockLine
     }
 
     return file_pos;
+}
+
+bool PartialLayout::updateDocumentFromFilter(int startMatchIndex)
+{
+    const QVector<qint64> & matches = view()->filterState().matchAddresses();
+    const int n = view()->numLinesOnScreen();
+    const int end = qMin(startMatchIndex + n, matches.size());
+
+    QString data;
+    std::vector<qint64> lineAddresses;
+
+    for(int i = startMatchIndex; i < end; i++) {
+        QString line;
+        std::vector<qint64> lineAddr;
+        if(!m_blockReader->readChunk(&line, &lineAddr, matches[i], 0, 1)) { return false; }
+        if(!lineAddr.empty()) {
+            lineAddresses.push_back(lineAddr.front());
+        }
+        data += line;
+    }
+
+    document()->setText(data, lineAddresses);
+    performLayout();
+    return true;
 }
 
 bool PartialLayout::updateDocument(qint64 start_pos, qint64 lines_after_start)

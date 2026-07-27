@@ -9,6 +9,8 @@
 #include "preferences/Preferences.h"
 #include "gui/PreferencesDialog.h"
 #include "gui/HighlightingDialog.h"
+#include "gui/FilterDialog.h"
+#include "gui/PatternFilterDialog.h"
 #include "view/TailView.h"
 #include "gui/SearchWidget.h"
 #include "session/SessionLoader.h"
@@ -242,9 +244,9 @@ void MainWindow::onCurrentTabChanged(int oldIndex, int newIndex)
     updateMenus();
     if(oldIndex != -1) {
         if(TailView * tailView = dynamic_cast<TailView*>(m_tabWidget->widget(oldIndex))) {
-            // disconnect file error slots
             disconnect(tailView, SIGNAL(fileError(QString)), m_statusBar.data(), SLOT(errorMessage(QString)));
             disconnect(tailView, SIGNAL(fileErrorCleared()), m_statusBar.data(), SLOT(clearMessage()));
+            disconnect(tailView, SIGNAL(filterChanged()), this, SLOT(onFilterChanged()));
         }
     }
 
@@ -271,6 +273,7 @@ void MainWindow::onCurrentTabChanged(int oldIndex, int newIndex)
         // Connect error signals
         connect(tailView, SIGNAL(fileError(QString)), m_statusBar.data(), SLOT(errorMessage(QString)));
         connect(tailView, SIGNAL(fileErrorCleared()), m_statusBar.data(), SLOT(clearErrorMessage()));
+        connect(tailView, SIGNAL(filterChanged()), this, SLOT(onFilterChanged()));
         if(!tailView->currentFileError().isEmpty()) {
             m_statusBar->errorMessage(tailView->currentFileError());
         }
@@ -340,6 +343,60 @@ void MainWindow::on_actionHighlighting_triggered()
 {
     HighlightingDialog dialog(this);
     dialog.exec();
+}
+
+void MainWindow::on_actionFilterByKeyword_triggered()
+{
+    TailView * view = getCurrentView();
+    if(!view) { return; }
+
+    FilterDialog dialog(this);
+    if(view->filterState().isActive()) {
+        dialog.setKeyword(view->filterState().pattern());
+    }
+    if(dialog.exec() == QDialog::Accepted) {
+        const QString kw = dialog.keyword();
+        if(kw.isEmpty()) { return; }
+        view->applyFilter(kw, dialog.isRegex(), dialog.isCaseSensitive());
+    }
+}
+
+void MainWindow::on_actionFilterByPattern_triggered()
+{
+    TailView * view = getCurrentView();
+    if(!view) { return; }
+
+    PatternFilterDialog dialog(this);
+    if(dialog.exec() == QDialog::Accepted) {
+        const HighlightRule rule = dialog.selectedRule();
+        if(rule.pattern.isEmpty()) { return; }
+        view->applyFilter(rule.pattern, rule.isRegex, rule.caseSensitive);
+    }
+}
+
+void MainWindow::on_actionClearFilter_triggered()
+{
+    if(TailView * view = getCurrentView()) {
+        view->clearFilter();
+    }
+}
+
+void MainWindow::onFilterChanged()
+{
+    TailView * view = getCurrentView();
+    if(!view) { return; }
+
+    if(view->filterState().isActive()) {
+        const int n = view->filterState().matchAddresses().size();
+        QString msg;
+        QTextStream(&msg) << tr("Filter active: ") << n << tr(" matches");
+        if(!view->followTail()) {
+            msg += tr("  —  F5 to refresh");
+        }
+        m_statusBar->filterMessage(msg);
+    } else {
+        m_statusBar->clearFilterMessage();
+    }
 }
 
 void MainWindow::on_actionDebugWindow_triggered()

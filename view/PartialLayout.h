@@ -26,6 +26,7 @@ public:
     virtual void scrollTo(int newTopLine);
     virtual bool scrollBy(int line_change);
     void scrollToAddress(qint64 address);
+    int filterMatchCount() const;
     virtual void updateAfterKeyPress();
     virtual void vScrollBarAction(int action);
 protected:
@@ -33,6 +34,7 @@ protected:
     virtual bool wrapAroundForDocumentSearch() const;
 private:
     void updateScrollBars();
+    bool updateDocumentFromFilter(int startMatchIndex);
     bool updateView(qint64 new_line_address = -1, bool * at_bottom = 0);
     bool scrollUp(int line_change);
     bool scrollDown(int line_change);
