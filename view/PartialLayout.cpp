@@ -22,6 +22,8 @@ const qint64 APPROXIMATE_CHARS_PER_LINE = 20;
 PartialLayout::PartialLayout(TailView * tailView)
     : LayoutStrategy(tailView)
     , m_topScreenLine(0)
+    , m_cachedLineNumberAddress(-1)
+    , m_cachedLineNumber(1)
     , m_bottomDocument(new YTextDocument())
 {
 }
@@ -131,6 +133,30 @@ bool PartialLayout::searchFile(bool isForward)
 bool PartialLayout::wrapAroundForDocumentSearch() const
 {
     return false;
+}
+
+int PartialLayout::firstVisibleLineNumber() const
+{
+    if(!m_blockReader) { return 1; }
+    const qint64 topAddr = topOfScreen();
+
+    // Cache by address — only recount when position changed
+    if(topAddr == m_cachedLineNumberAddress) {
+        return m_cachedLineNumber + 1;
+    }
+
+    // Count newlines from file start to topAddr
+    int lineNum = 0;
+    qint64 pos = 0;
+    while(pos < topAddr && pos < m_blockReader->size()) {
+        qint64 next = m_blockReader->getStartPosition(pos, 1);
+        if(next <= pos) { break; }
+        lineNum++;
+        pos = next;
+    }
+    m_cachedLineNumberAddress = topAddr;
+    m_cachedLineNumber = lineNum;
+    return lineNum + 1;
 }
 
 void PartialLayout::updateAfterKeyPress()

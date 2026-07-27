@@ -13,8 +13,6 @@
 #include "app/YObjectPointer.h"
 #include "filter/FilterState.h"
 
-class FilterScanThread;
-
 class DocumentSearch;
 class FullLayout;
 class LayoutStrategy;
@@ -75,10 +73,15 @@ public:
     void clearFilter();
     const FilterState & filterState() const { return m_filterState; }
 
+    // Line numbers
+    int lineNumberAreaWidth() const;
+    void paintLineNumbers(QPainter * painter, const QRect & rect);
+
 signals:
     void fileError(const QString &);
     void fileErrorCleared();
     void filterChanged();
+    void lineInfoChanged(int currentLine, int totalLines);
 
 public slots:
     void newSearch();
@@ -101,7 +104,6 @@ protected:
 private slots:
     void vScrollBarAction(int action);
     void onPreferencesChanged();
-    void onScanFinished(QVector<qint64> matchAddresses);
 
 private:
     void searchFile(bool isForward);
@@ -124,7 +126,6 @@ private:
     bool m_followTail;
     FilterState m_filterState;
     qint64 m_lastScannedSize;
-    QScopedPointer<FilterScanThread> m_scanThread;
 
     QScopedPointer<DocumentSearch> m_documentSearch;
 };

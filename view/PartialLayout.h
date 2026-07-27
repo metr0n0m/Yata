@@ -32,6 +32,7 @@ public:
 protected:
     virtual bool searchFile(bool isForward);
     virtual bool wrapAroundForDocumentSearch() const;
+    virtual int firstVisibleLineNumber() const;
 private:
     void updateScrollBars();
     bool updateDocumentFromFilter(int startMatchIndex);
@@ -46,6 +47,8 @@ private:
     qint64 bottomScreenPosition(int * blockLine = 0) const;
 private:
     int m_topScreenLine;
+    mutable qint64 m_cachedLineNumberAddress;
+    mutable int m_cachedLineNumber;
     QScopedPointer<YTextDocument> m_bottomDocument;
     QScopedPointer<FileBlockReader> m_blockReader;
 };

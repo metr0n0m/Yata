@@ -8,17 +8,22 @@
 #include "YStatusBar.h"
 #include <QLabel>
 #include <QStringBuilder>
+#include <QTextStream>
 
 YStatusBar::YStatusBar(QWidget *parent):
     QStatusBar(parent),
     m_leftLabel(new QLabel(this)),
-    m_filterLabel(new QLabel(this))
+    m_filterLabel(new QLabel(this)),
+    m_lineLabel(new QLabel(this))
 {
     m_leftLabel->setMinimumSize(QSize(1,1));
     addWidget(m_leftLabel.data());
 
     m_filterLabel->setMinimumSize(QSize(1,1));
     addPermanentWidget(m_filterLabel.data());
+
+    m_lineLabel->setMinimumSize(QSize(1,1));
+    addPermanentWidget(m_lineLabel.data());
 }
 
 YStatusBar::~YStatusBar()
@@ -47,4 +52,16 @@ void YStatusBar::filterMessage(const QString & msg)
 void YStatusBar::clearFilterMessage()
 {
     m_filterLabel->clear();
+}
+
+void YStatusBar::lineInfo(int currentLine, int totalLines)
+{
+    QString msg;
+    QTextStream(&msg) << tr("Ln ") << currentLine << tr(" / ") << totalLines;
+    m_lineLabel->setText(msg);
+}
+
+void YStatusBar::clearLineInfo()
+{
+    m_lineLabel->clear();
 }

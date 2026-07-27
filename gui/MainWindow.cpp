@@ -241,12 +241,14 @@ TailView * MainWindow::getCurrentView()
 void MainWindow::onCurrentTabChanged(int oldIndex, int newIndex)
 {
     m_statusBar->clearErrorMessage();
+    m_statusBar->clearLineInfo();
     updateMenus();
     if(oldIndex != -1) {
         if(TailView * tailView = dynamic_cast<TailView*>(m_tabWidget->widget(oldIndex))) {
             disconnect(tailView, SIGNAL(fileError(QString)), m_statusBar.data(), SLOT(errorMessage(QString)));
             disconnect(tailView, SIGNAL(fileErrorCleared()), m_statusBar.data(), SLOT(clearMessage()));
             disconnect(tailView, SIGNAL(filterChanged()), this, SLOT(onFilterChanged()));
+            disconnect(tailView, SIGNAL(lineInfoChanged(int,int)), m_statusBar.data(), SLOT(lineInfo(int,int)));
         }
     }
 
@@ -275,6 +277,7 @@ void MainWindow::onCurrentTabChanged(int oldIndex, int newIndex)
         connect(tailView, SIGNAL(fileError(QString)), m_statusBar.data(), SLOT(errorMessage(QString)));
         connect(tailView, SIGNAL(fileErrorCleared()), m_statusBar.data(), SLOT(clearErrorMessage()));
         connect(tailView, SIGNAL(filterChanged()), this, SLOT(onFilterChanged()));
+        connect(tailView, SIGNAL(lineInfoChanged(int,int)), m_statusBar.data(), SLOT(lineInfo(int,int)));
         if(!tailView->currentFileError().isEmpty()) {
             m_statusBar->errorMessage(tailView->currentFileError());
         }

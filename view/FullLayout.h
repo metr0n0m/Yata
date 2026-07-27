@@ -23,6 +23,7 @@ public:
     virtual void vScrollBarAction(int action);
     virtual bool searchFile(bool isForward);
     virtual bool wrapAroundForDocumentSearch() const;
+    virtual int firstVisibleLineNumber() const;
 };
 
 #endif // FULLLAYOUT_H

@@ -25,10 +25,13 @@ public slots:
     void clearErrorMessage();
     void filterMessage(const QString & msg);
     void clearFilterMessage();
+    void lineInfo(int currentLine, int totalLines);
+    void clearLineInfo();
 
 private:
     YObjectPointer<QLabel> m_leftLabel;
     YObjectPointer<QLabel> m_filterLabel;
+    YObjectPointer<QLabel> m_lineLabel;
 };
 
 #endif // YSTATUSBAR_H

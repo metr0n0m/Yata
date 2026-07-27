@@ -16,7 +16,7 @@
 #include "preferences/TextColor.h"
 #include "search/SearchInfo.h"
 #include "highlight/HighlightRules.h"
-#include "filter/FilterScanThread.h"
+#include "filter/FileFilter.h"
 #include "app/YApplication.h"
 #include "document/YFileCursor.h"
 #include "watcher/YFileSystemWatcherThread.h"
@@ -271,27 +271,22 @@ void TailView::setActive(bool active)
 
 void TailView::onFileChanged()
 {
-    // If filter is active and a scan is NOT already running, check for new content
-    if(m_filterState.isActive() && !m_filename.isEmpty() && !m_scanThread) {
+    // If filter is active, check for new or changed content
+    if(m_filterState.isActive() && !m_filename.isEmpty()) {
         QFileInfo info(m_filename);
         qint64 currentSize = info.size();
         if(currentSize < m_lastScannedSize) {
-            // File shrank — rescan from scratch asynchronously
-            applyFilter(m_filterState.pattern(),
+            // File shrank (rotation/truncate) — rescan from scratch
+            m_filterState.setPattern(m_filterState.pattern(),
                 m_filterState.isRegex(), m_filterState.caseSensitive());
-            return;
-        } else if(currentSize > m_lastScannedSize) {
-            // Scan only new content asynchronously
-            qint64 scanFrom = m_lastScannedSize;
+            FileFilter::scanAll(m_filename, &m_filterState);
             m_lastScannedSize = currentSize;
-            FilterScanThread * t = new FilterScanThread(
-                m_filename, m_filterState.pattern(),
-                m_filterState.isRegex(), m_filterState.caseSensitive(),
-                scanFrom, this);
-            connect(t, SIGNAL(scanFinished(QVector<qint64>)),
-                    this, SLOT(onScanFinished(QVector<qint64>)));
-            t->start();
-            return;
+            emit filterChanged();
+        } else if(currentSize > m_lastScannedSize) {
+            // Scan only new content
+            FileFilter::scanFrom(m_filename, m_lastScannedSize, &m_filterState);
+            m_lastScannedSize = currentSize;
+            emit filterChanged();
         }
     }
 
@@ -388,6 +383,9 @@ void TailView::paintEvent(QPaintEvent * event)
 {
     m_layoutStrategy->performLayout();
 
+    const int lnWidth = lineNumberAreaWidth();
+    setViewportMargins(lnWidth, 0, 0, 0);
+
     QPainter painter(viewport());
     QRectF viewrect(event->rect());
     painter.fillRect(viewrect, Preferences::instance()->normalTextColor().background());
@@ -406,6 +404,16 @@ void TailView::paintEvent(QPaintEvent * event)
             layout->draw(&painter, start);
         }
     }
+
+    // Paint line numbers in the left margin (outside viewport)
+    QPainter lnPainter(this);
+    QRect lnRect(0, viewport()->pos().y(), lnWidth, viewport()->height());
+    paintLineNumbers(&lnPainter, lnRect);
+
+    // Update status bar line info
+    int firstLine = m_layoutStrategy->firstVisibleLineNumber();
+    int totalLines = firstLine + m_document->lineAddresses().size() - 1;
+    emit lineInfoChanged(firstLine, totalLines);
 }
 
 void TailView::resizeEvent(QResizeEvent *)
@@ -497,6 +505,52 @@ int TailView::numLinesOnScreen() const
     return result;
 }
 
+int TailView::lineNumberAreaWidth() const
+{
+    // Width needed to display the largest possible line number + padding
+    int maxLineNum = m_layoutStrategy->firstVisibleLineNumber() + numLinesOnScreen();
+    const QFont & font = Preferences::instance()->font();
+    QFontMetrics fm(font);
+    int digits = QString::number(qMax(maxLineNum, 1)).length();
+    return fm.width(QLatin1Char('9')) * digits + 8;
+}
+
+void TailView::paintLineNumbers(QPainter * painter, const QRect & rect)
+{
+    const QFont & font = Preferences::instance()->font();
+    QFontMetrics fontMetrics(font);
+    int lineSpacing = fontMetrics.lineSpacing();
+
+    // Background of line number area
+    QColor bgColor = Preferences::instance()->normalTextColor().background().darker(110);
+    QColor fgColor = Preferences::instance()->normalTextColor().foreground();
+    fgColor.setAlpha(160);
+    painter->fillRect(rect, bgColor);
+
+    // Separator line on right edge
+    painter->setPen(QPen(fgColor, 1));
+    painter->drawLine(rect.right(), rect.top(), rect.right(), rect.bottom());
+
+    int firstLine = m_layoutStrategy->firstVisibleLineNumber();
+    int scrollValue = m_layoutStrategy->topScreenLine();
+
+    for(QTextBlock block = m_document->begin(); block != m_document->end(); block = block.next()) {
+        qreal dy = m_document->blockGraphicalPositions().at(block.blockNumber());
+        int y = static_cast<int>(dy) - scrollValue * lineSpacing;
+
+        if(y + lineSpacing < rect.top()) { continue; }
+        if(y > rect.bottom()) { break; }
+
+        int lineNum = firstLine + block.blockNumber();
+        QString numStr = QString::number(lineNum);
+
+        painter->setPen(fgColor);
+        painter->setFont(font);
+        painter->drawText(0, y, rect.width() - 4, lineSpacing,
+                         Qt::AlignRight | Qt::AlignVCenter, numStr);
+    }
+}
+
 qint64 TailView::sessionAddress() const
 {
     const BlockDataVector<qint64> & addresses = m_document->lineAddresses();
@@ -515,49 +569,24 @@ void TailView::scrollToAddress(qint64 address)
 
 void TailView::applyFilter(const QString & pattern, bool isRegex, bool caseSensitive)
 {
-    // Stop any running scan
-    if(m_scanThread) {
-        m_scanThread->stop();
-        m_scanThread.reset();
-    }
-
     m_filterState.setPattern(pattern, isRegex, caseSensitive);
     m_lastScannedSize = 0;
 
-    if(m_filename.isEmpty()) {
-        emit filterChanged();
-        return;
+    if(!m_filename.isEmpty()) {
+        FileFilter::scanAll(m_filename, &m_filterState);
+        QFileInfo info(m_filename);
+        m_lastScannedSize = info.size();
     }
 
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-
-    m_scanThread.reset(new FilterScanThread(
-        m_filename, pattern, isRegex, caseSensitive, 0, this));
-    connect(m_scanThread.data(), SIGNAL(scanFinished(QVector<qint64>)),
-            this, SLOT(onScanFinished(QVector<qint64>)));
-    m_scanThread->start();
-}
-
-void TailView::clearFilter()
-{
-    if(m_scanThread) {
-        m_scanThread->stop();
-        m_scanThread.reset();
-    }
-    QApplication::restoreOverrideCursor();
-    m_filterState.clear();
-    m_lastScannedSize = 0;
     m_document->markDirty();
     onFileChanged();
     emit filterChanged();
 }
 
-void TailView::onScanFinished(QVector<qint64> matchAddresses)
+void TailView::clearFilter()
 {
-    QApplication::restoreOverrideCursor();
-    m_filterState.setMatchAddresses(matchAddresses);
-    QFileInfo info(m_filename);
-    m_lastScannedSize = info.size();
+    m_filterState.clear();
+    m_lastScannedSize = 0;
     m_document->markDirty();
     onFileChanged();
     emit filterChanged();

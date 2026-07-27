@@ -82,3 +82,8 @@ bool FullLayout::wrapAroundForDocumentSearch() const
 {
     return true;
 }
+
+int FullLayout::firstVisibleLineNumber() const
+{
+    return topScreenLine() + 1;
+}

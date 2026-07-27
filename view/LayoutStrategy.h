@@ -26,6 +26,10 @@ public:
     virtual bool searchFile(bool isForward) = 0;
     virtual bool wrapAroundForDocumentSearch() const = 0;
 
+    // Returns 1-based line number of the first visible block in the document.
+    // FullLayout counts exactly; PartialLayout counts from file start — cached.
+    virtual int firstVisibleLineNumber() const = 0;
+
 protected:
     LayoutStrategy(TailView * tailView);
 

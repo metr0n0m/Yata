@@ -24,7 +24,7 @@ INCLUDEPATH += . gui
 HEADERS += \
     app/YApplication.h \
     filter/FilterState.h \
-    filter/FilterScanThread.h \
+    filter/FileFilter.h \
     highlight/HighlightRule.h \
     gui/FilterDialog.h \
     gui/PatternFilterDialog.h \
@@ -80,7 +80,7 @@ FORMS += \
 SOURCES += \
     app/YApplication.cpp \
     filter/FilterState.cpp \
-    filter/FilterScanThread.cpp \
+    filter/FileFilter.cpp \
     highlight/HighlightRule.cpp \
     gui/FilterDialog.cpp \
     gui/PatternFilterDialog.cpp \
