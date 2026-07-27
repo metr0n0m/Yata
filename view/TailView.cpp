@@ -15,6 +15,7 @@
 #include "preferences/Preferences.h"
 #include "preferences/TextColor.h"
 #include "search/SearchInfo.h"
+#include "highlight/HighlightRules.h"
 #include "app/YApplication.h"
 #include "document/YFileCursor.h"
 #include "watcher/YFileSystemWatcherThread.h"
@@ -51,6 +52,7 @@ TailView::TailView(QWidget * parent)
 {
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), SLOT(vScrollBarAction(int)));
     connect(Preferences::instance(), SIGNAL(preferencesChanged()), SLOT(onPreferencesChanged()));
+    connect(&HighlightRules::instance(), SIGNAL(rulesChanged()), SLOT(onPreferencesChanged()));
 
     QAction * copy = new QAction(tr("&Copy"), this);
     copy->setShortcut(QKeySequence(QKeySequence::Copy));

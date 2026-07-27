@@ -13,7 +13,6 @@
 #include <QScopedPointer>
 #include <vector>
 
-class LogHighlighter;
 class QFont;
 class QTextBlock;
 class QTextDocument;
@@ -75,7 +74,6 @@ private:
 
 private:
     YObjectPointer<QTextDocument> m_document;
-    QScopedPointer<LogHighlighter> m_highlighter;
     QScopedPointer<YFileCursor> m_selectedCursor;
 
     int m_numLayoutLines;

@@ -23,7 +23,6 @@ INCLUDEPATH += . gui
 # Input
 HEADERS += \
     app/YApplication.h \
-    document/LogHighlighter.h \
     highlight/HighlightRule.h \
     highlight/HighlightRules.h \
     gui/HighlightRuleDialog.h \
@@ -74,7 +73,6 @@ FORMS += \
 
 SOURCES += \
     app/YApplication.cpp \
-    document/LogHighlighter.cpp \
     highlight/HighlightRule.cpp \
     highlight/HighlightRules.cpp \
     gui/HighlightRuleDialog.cpp \

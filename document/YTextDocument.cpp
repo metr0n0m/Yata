@@ -6,14 +6,17 @@
  */
 #include "YTextDocument.h"
 #include "YFileCursor.h"
-#include "LogHighlighter.h"
 #include "preferences/TextColor.h"
 #include "preferences/Preferences.h"
+#include "highlight/HighlightRules.h"
+#include "highlight/HighlightRule.h"
 
 #include <QApplication>
 #include <QFontMetrics>
 #include <QPalette>
+#include <QRegExp>
 #include <QTextBlock>
+#include <QTextCharFormat>
 #include <QTextCursor>
 #include <QTextDocument>
 #include <QTextLayout>
@@ -22,7 +25,6 @@
 
 YTextDocument::YTextDocument():
     m_document(new QTextDocument()),
-    m_highlighter(new LogHighlighter(m_document.data())),
     m_selectedCursor(new YFileCursor),
     m_numLayoutLines(0),
     m_blockLayoutLines(m_document.data()),
@@ -74,6 +76,29 @@ void YTextDocument::layout(int width)
     cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
     cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
     setColors(&cursor, Preferences::instance()->normalTextColor());
+
+    // Apply highlight rules — iterate every block, every rule, every match
+    const QList<HighlightRule> & rules = HighlightRules::instance().rules();
+    for(QTextBlock block = m_document->begin(); block != m_document->end(); block = block.next()) {
+        const QString text = block.text();
+        for(int ri = 0; ri < rules.size(); ri++) {
+            const HighlightRule & rule = rules[ri];
+            if(!rule.enabled || rule.pattern.isEmpty()) { continue; }
+            QRegExp regex(rule.pattern,
+                rule.caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive,
+                rule.isRegex ? QRegExp::RegExp2 : QRegExp::FixedString);
+            int pos = 0;
+            while((pos = regex.indexIn(text, pos)) != -1) {
+                int len = regex.matchedLength();
+                if(len == 0) { break; }
+                QTextCursor tc(m_document.data());
+                tc.setPosition(block.position() + pos);
+                tc.setPosition(block.position() + pos + len, QTextCursor::KeepAnchor);
+                setColors(&tc, rule.color);
+                pos += len;
+            }
+        }
+    }
 
     select(*m_selectedCursor);
 
