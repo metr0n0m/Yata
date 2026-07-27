@@ -19,8 +19,8 @@
 !ifndef OUTDIR
     !define OUTDIR "."
 !endif
-!define QTDIR "C:\Qt\4.8.0"
-!define MINGWDIR "C:\QtSDK\mingw\bin"
+!define QTDIR "C:\Qt\4.8.7"
+!define MINGWDIR "C:\mingw32\bin"
 !define QTBINDIR "${QTDIR}\bin"
 
 ;--------------------------------
@@ -81,8 +81,9 @@ SectionEnd
 ShowInstDetails show
 Section
     SetOutPath "$INSTDIR"
-    File "${MINGWDIR}\mingwm10.dll"
     File "${MINGWDIR}\libgcc_s_dw2-1.dll"
+    File "${MINGWDIR}\libstdc++-6.dll"
+    File "${MINGWDIR}\libwinpthread-1.dll"
 
     File "${QTBINDIR}\QtCore4.dll"
     File "${QTBINDIR}\QtGui4.dll"
@@ -120,8 +121,9 @@ SectionEnd
 
 Section "Uninstall"
 
-    Delete "$INSTDIR\mingwm10.dll"
     Delete "$INSTDIR\libgcc_s_dw2-1.dll"
+    Delete "$INSTDIR\libstdc++-6.dll"
+    Delete "$INSTDIR\libwinpthread-1.dll"
 
     Delete "$INSTDIR\QtCore4.dll"
     Delete "$INSTDIR\QtGui4.dll"

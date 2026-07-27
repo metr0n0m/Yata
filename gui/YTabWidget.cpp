@@ -9,7 +9,6 @@
 #include "view/TailView.h"
 
 #include <QActionGroup>
-#include <QStyle>
 #include <QApplication>
 #include <QClipboard>
 #include <QContextMenuEvent>
@@ -80,8 +79,7 @@ QMenu * YTabWidget::contextMenu()
 
 void YTabWidget::openTab(QWidget * child, const QString & fullName, const QString & shortName)
 {
-    QIcon icon = qApp->style()->standardIcon(QStyle::SP_FileIcon);
-    int index = addTab(child, icon, shortName);
+    int index = addTab(child, QIcon(":/yata.png"), shortName);
     child->setFocus();
     setTabToolTip(index, fullName);
 
